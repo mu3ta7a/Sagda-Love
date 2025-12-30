@@ -306,9 +306,7 @@
 
     </div>
 
-    <audio id="bg-music" loop>
-        <source src="https://h.top4top.io/m_36518ijyi0.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bg-music"></audio>
 
     <audio id="player-music"></audio>
 
@@ -317,6 +315,31 @@
     </div>
 
     <script>
+        // --- 0. إعدادات قائمة التشغيل (Playlist) ---
+        // حطيت هنا اللينكين بتوعك
+        const bgPlaylist = [
+            "https://h.top4top.io/m_36518ijyi0.mp3", // الأغنية الأولى
+            "https://a.top4top.io/m_36510gkee0.mp3"  // الأغنية التانية
+        ];
+        let currentTrackIndex = 0; // نبدأ بأول أغنية
+        var bgMusic = document.getElementById("bg-music");
+
+        // دالة تشغيل الخلفية وتغيير الأغنية لما تخلص
+        function initBgMusic() {
+            bgMusic.src = bgPlaylist[currentTrackIndex];
+            bgMusic.volume = 0.5;
+            
+            // لما الأغنية تخلص، شغل اللي بعدها
+            bgMusic.addEventListener('ended', function() {
+                currentTrackIndex++;
+                if (currentTrackIndex >= bgPlaylist.length) {
+                    currentTrackIndex = 0; // لو خلصوا ارجع للأولى
+                }
+                bgMusic.src = bgPlaylist[currentTrackIndex];
+                bgMusic.play().catch(e => console.log("Auto-play blocked"));
+            });
+        }
+
         // --- 1. منطق الباسورد ---
         function checkPassword() {
             var input = document.getElementById('passInput').value;
@@ -328,9 +351,9 @@
                     document.getElementById('main-app').style.display = 'block';
                     document.getElementById('musicBtn').style.display = 'block';
                     
-                    var bgAudio = document.getElementById("bg-music");
-                    bgAudio.volume = 0.5;
-                    bgAudio.play().catch(e => console.log("Audio play failed"));
+                    // تشغيل البلاي ليست
+                    initBgMusic();
+                    bgMusic.play().catch(e => console.log("Audio play failed"));
                 }, 500);
             } else {
                 var err = document.getElementById('error-msg');
@@ -358,7 +381,6 @@
                 <div class="time-box"><span class="time-val">${seconds}</span><span class="time-label">Secs</span></div>
             `;
 
-            // 👇👇 لو الوقت خلص 👇👇
             if (diff < 0) {
                 clearInterval(x);
                 document.getElementById("countdown").innerHTML = `
@@ -371,7 +393,6 @@
         }, 1000);
 
         // --- 3. إدارة الصوت الشاملة ---
-        var bgMusic = document.getElementById("bg-music");
         var player = document.getElementById("player-music");
         const allVideos = document.querySelectorAll('video');
 
